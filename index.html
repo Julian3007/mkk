@@ -45,61 +45,87 @@
             border-radius: 50%;
         }
         .play-button, .stop-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: static; /* Align with other buttons */
+            transform: none; /* Remove centering styles */
             font-size: 48px;
             color: #0D0D0D; /* Updated color */
             cursor: pointer;
             z-index: 3; /* Ensure it is above the spinning vinyl */
-            text-shadow: 0 0 20px #D918B9; /* Glow effect */
         }
-        .stop-button {
-            display: none;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(-360deg); }
-        }
-        .spinning {
-            animation: spin 5s linear infinite;
-        }
+
         .container {
-            text-align: center;
             z-index: 2;
         }
         .buttons {
             position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 10px; /* Position the buttons near the top */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for centering */
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Center the buttons within the container */
+            align-items: center;
+            width: auto; /* Allow the width to adjust dynamically */
             z-index: 2;
         }
-        .buttons a {
+        .buttons a, .play-button, .stop-button {
             display: inline-block;
-            margin: 10px;
+            margin: 0 10px; /* Add spacing between buttons */
             color: #5CB9F2;
             text-decoration: none;
             font-size: 48px;
             transition: color 0.3s;
+            cursor: pointer;
         }
-        .buttons a:hover {
+        .buttons a:hover, .play-button:hover, .stop-button:hover {
             color: #9305F2;
+        }
+        .play-button, .stop-button {
+            position: static; /* Align with other buttons */
+            transform: none; /* Remove centering styles */
         }
         @media (max-width: 768px) {
             .vinyl {
                 width: 300px; /* Adjust size for mobile */
                 height: 300px; /* Adjust size for mobile */
-                margin-top: -166px; /* Half of the height */
-                margin-left: -166px; /* Half of the width */
-                border: 15px solid #D918B9; /* Adjust size for mobile */
+                margin-top: -150px; /* Half of the height */
+                margin-left: -150px; /* Half of the width */
+                border: 15px solid #D918B9; /* Adjust border size for mobile */
             }
-            .buttons a {
-                font-size: 24px; /* Adjust font size for mobile */
+            .vinyl img {
+                width: 80%; /* Ensure the image scales properly */
+                height: 80%;
             }
+            .buttons {
+                width: 300px; /* Adjust button container width for mobile */
+                top: 10px; /* Adjust position for mobile */
+            }
+            .buttons a, .play-button, .stop-button {
+                font-size: 24px; /* Adjust button size for mobile */
+                margin: 0 10px; /* Reduce spacing between buttons */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .vinyl {
+                width: 200px; /* Further adjust size for very small screens */
+                height: 200px;
+                margin-top: -100px; /* Half of the height */
+                margin-left: -100px; /* Half of the width */
+                border: 10px solid #D918B9; /* Adjust border size */
+            }
+            .buttons {
+                width: 200px; /* Make buttons fit smaller screens */
+            }
+            .buttons a, .play-button, .stop-button {
+                font-size: 18px; /* Smaller button size for very small screens */
+                margin: 0 5px; /* Reduce spacing further */
+            }
+        }
+    </style>
+    <style>
+        .stop-button {
+            display: none; /* Initially hidden */
+            visibility: hidden; /* Ensure it is not visible */
         }
     </style>
 </head>
@@ -107,36 +133,91 @@
     <div class="vinyl" id="vinyl">
         <img src="logo.jpg" alt="Magik Karpet Karavan Logo" onerror="this.style.display='none'; document.getElementById('fallback-text').style.display='block';">
     </div>
-    <div class="play-button" id="play-button" onclick="playAudio()">
-        <i class="fas fa-play-circle"></i>
-    </div>
-    <div class="stop-button" id="stop-button" onclick="stopAudio()">
-        <i class="fas fa-stop-circle"></i>
-    </div>
+    <audio id="audio" src="lofl.mp3" loop></audio>
     <div class="container">
         <h1 id="fallback-text" style="display:none;">Magik Karpet Karavan</h1>
         <div class="buttons">
             <a href="https://soundcloud.com/magik-karpet-karavan" target="_blank"><i class="fab fa-soundcloud"></i></a>
             <a href="https://magikkarpetkaravan.bandcamp.com/" target="_blank"><i class="fab fa-bandcamp"></i></a>
-            <a href="https://instagram.com/magik.karpet.karavan/" target="_blank"><i class="fab fa-instagram"></i></a>
+            <div class="play-button" id="play-button" onclick="playAudio()">
+                <i class="fas fa-play-circle"></i>
+            </div>
+            <div class="stop-button" id="stop-button" onclick="stopAudio()">
+                <i class="fas fa-stop-circle"></i>
+            </div>
             <a href="https://t.me/mkkmusicinfo" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="https://instagram.com/magik.karpet.karavan/" target="_blank"><i class="fab fa-instagram"></i></a>
         </div>
-    </div>
-    <audio id="audio" src="lofl.mp3" loop></audio>
     <script>
+        let currentRotation = 0; // Variable to store the current rotation angle
+        let isSpinning = false; // Track if the vinyl is spinning
+    
         function playAudio() {
-            document.getElementById('audio').play();
-            document.getElementById('vinyl').classList.add('spinning');
-            document.getElementById('play-button').style.display = 'none';
-            document.getElementById('stop-button').style.display = 'block';
+            const audio = document.getElementById('audio');
+            const vinyl = document.getElementById('vinyl');
+            const playButton = document.getElementById('play-button');
+            const stopButton = document.getElementById('stop-button');
+    
+            if (!isSpinning) {
+                // Dynamically set the starting point of the animation
+                vinyl.style.animation = `spin 15s linear infinite`;
+                vinyl.style.transform = `rotate(${currentRotation}deg)`;
+                vinyl.style.animation = `spin 15s linear infinite`;
+                vinyl.style.setProperty('--start-rotation', `${currentRotation}deg`);
+                isSpinning = true;
+            }
+    
+            // Resume audio playback
+            audio.play();
+    
+            playButton.style.display = 'none'; // Hide play button
+            playButton.style.visibility = 'hidden'; // Ensure it's not visible
+            stopButton.style.display = 'block'; // Show stop button
+            stopButton.style.visibility = 'visible'; // Ensure it's visible
         }
-
+    
         function stopAudio() {
-            document.getElementById('audio').pause();
-            document.getElementById('vinyl').classList.remove('spinning');
-            document.getElementById('stop-button').style.display = 'none';
-            document.getElementById('play-button').style.display = 'block';
+            const audio = document.getElementById('audio');
+            const vinyl = document.getElementById('vinyl');
+            const playButton = document.getElementById('play-button');
+            const stopButton = document.getElementById('stop-button');
+    
+            // Pause the audio
+            audio.pause();
+    
+            // Get the current rotation angle
+            const computedStyle = window.getComputedStyle(vinyl);
+            const matrix = computedStyle.transform;
+    
+            if (matrix !== 'none') {
+                const values = matrix.split('(')[1].split(')')[0].split(',');
+                const a = parseFloat(values[0]);
+                const b = parseFloat(values[1]);
+                currentRotation = Math.round(Math.atan2(b, a) * (180 / Math.PI)); // Convert to degrees
+            }
+    
+            // Stop spinning and preserve the current rotation
+            vinyl.style.animation = 'none';
+            vinyl.style.transform = `rotate(${currentRotation}deg)`;
+            isSpinning = false;
+    
+            stopButton.style.display = 'none'; // Hide stop button
+            stopButton.style.visibility = 'hidden'; // Ensure it's not visible
+            playButton.style.display = 'block'; // Show play button
+            playButton.style.visibility = 'visible'; // Ensure it's visible
         }
     </script>
+    
+    <style>
+        @keyframes spin {
+            from {
+                transform: rotate(var(--start-rotation, 0deg));
+            }
+            to {
+                transform: rotate(calc(var(--start-rotation, 0deg) + 360deg));
+            }
+        }
+    </style>
+</style>
 </body>
 </html>
