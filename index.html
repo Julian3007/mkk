@@ -134,7 +134,7 @@
     </style>
 </head>
 <body>
-    <div class="vinyl" id="vinyl">
+    <div class="vinyl" id="vinyl" onclick="toggleAudio()">
         <img src="logo.jpg" alt="Magik Karpet Karavan Logo" onerror="this.style.display='none'; document.getElementById('fallback-text').style.display='block';">
     </div>
     <audio id="audio" src="lofl.mp3" loop></audio>
@@ -210,8 +210,30 @@
             playButton.style.display = 'block'; // Show play button
             playButton.style.visibility = 'visible'; // Ensure it's visible
         }
+
+        function toggleAudio() {
+            const audio = document.getElementById('audio');
+            if (audio.paused) {
+                playAudio();
+            } else {
+                stopAudio();
+            }
+        }
     </script>
     
+    <script>
+        function toggleAudio() {
+            const audio = document.getElementById('audio');
+            const isPaused = audio.paused;
+
+            if (isPaused) {
+                playAudio(); // Call the play function if audio is paused
+            } else {
+                stopAudio(); // Call the stop function if audio is playing
+            }
+        }
+    </script>
+
     <style>
         @keyframes spin {
             from {
